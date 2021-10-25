@@ -7,11 +7,12 @@
 - OpenCV
 
 ## Parameter
-- video_path: 再生する動画のファイルパス
-- publish_topic_name: publishするトピック名 (default: "image_raw")
-- frame_id: publishする画像のframe_id (default; "map")
-- loop: ループ再生するかどうか (default: False)
-- speed: 再生速度。intではなく、doubleで指定すること。 (default: 1.0)
+- `video_path`: 再生する動画のファイルパス
+- `publish_topic_name`: publishするトピック名 (default: "image_raw")
+- `image_size`: publishする画像サイズ (default: [640, 480])
+- `frame_id`: publishする画像のframe_id (default; "map")
+- `loop`: ループ再生するかどうか (default: False)
+- `speed`: 再生速度。intではなく、doubleで指定すること。 (default: 1.0)
 
 ## DEMO
 ### Play sample movie.

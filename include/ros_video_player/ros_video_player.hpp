@@ -29,6 +29,7 @@ namespace ros_video_player{
         std::string publish_topic_name_;
         std::string video_path_;
         std::string frame_id_;
+        cv::Size image_size_;
         bool loop_;
         double speed_;
     };

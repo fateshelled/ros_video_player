@@ -29,7 +29,7 @@ namespace ros_video_player{
             rclcpp::shutdown();
         }
         if(this->cap_.isOpened() == false){
-            RCLCPP_WARN(this->get_logger(), "can't open " + this->video_path_ + ".");
+            RCLCPP_ERROR(this->get_logger(), "can't open " + this->video_path_ + ".");
             rclcpp::shutdown();
         }
         
@@ -46,16 +46,20 @@ namespace ros_video_player{
     }
 
     void VideoPlayerNode::initializeParameter_(){
-        this->declare_parameter("publish_topic_name", "image_raw");
-        this->declare_parameter("video_path", "");
-        this->declare_parameter("frame_id", "map");
-        this->declare_parameter("loop", true);
-        this->declare_parameter("speed", 1.0);
+        this->declare_parameter<std::string>("publish_topic_name", "image_raw");
+        this->declare_parameter<std::string>("video_path", "");
+        this->declare_parameter<std::string>("frame_id", "map");
+        this->declare_parameter<bool>("loop", true);
+        this->declare_parameter<double>("speed", 1.0);
+        this->declare_parameter<std::vector<int64_t>>("image_size", {640, 480});
+
         this->publish_topic_name_ = this->get_parameter("publish_topic_name").as_string();
         this->video_path_ = this->get_parameter("video_path").as_string();
         this->frame_id_ = this->get_parameter("frame_id").as_string();
         this->loop_ = this->get_parameter("loop").as_bool();
         this->speed_ = this->get_parameter("speed").as_double();
+        auto image_size = this->get_parameter("image_size").as_integer_array();
+        this->image_size_ = cv::Size(image_size.at(0), image_size.at(1));
         if(this->speed_ < 0){
             this->speed_ = 1.0;
         }
@@ -80,6 +84,7 @@ namespace ros_video_player{
             }
         }
 
+        cv::resize(frame_, frame_, this->image_size_);
         sensor_msgs::msg::Image::SharedPtr pub_img;
         std_msgs::msg::Header header;
         header.stamp = this->now();
