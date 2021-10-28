@@ -63,6 +63,7 @@ namespace ros_video_player{
         if(this->speed_ < 0){
             this->speed_ = 1.0;
         }
+        header_.frame_id = this->frame_id_;
     }
     void VideoPlayerNode::captureCallback_(){
 
@@ -84,13 +85,10 @@ namespace ros_video_player{
             }
         }
 
-        cv::resize(frame_, frame_, this->image_size_);
-        sensor_msgs::msg::Image::SharedPtr pub_img;
-        std_msgs::msg::Header header;
-        header.stamp = this->now();
-        header.frame_id = this->frame_id_;
-        pub_img = cv_bridge::CvImage(header, "bgr8", this->frame_).toImageMsg();
-        this->pub_image_.publish(pub_img);
+        cv::resize(frame_, resized_, this->image_size_);
+        header_.stamp = this->now();
+        sensor_msgs::msg::Image::SharedPtr pub_img_ = cv_bridge::CvImage(header_, "bgr8", resized_).toImageMsg();
+        this->pub_image_.publish(pub_img_);
     }
 }
 

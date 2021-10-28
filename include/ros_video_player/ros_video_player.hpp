@@ -22,6 +22,8 @@ namespace ros_video_player{
         void captureCallback_();
         cv::VideoCapture cap_;
         cv::Mat frame_;
+        cv::Mat resized_;
+        std_msgs::msg::Header header_;
 
         image_transport::Publisher pub_image_;
         rclcpp::TimerBase::SharedPtr capture_timer_;
