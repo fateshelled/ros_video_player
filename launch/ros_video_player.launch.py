@@ -10,7 +10,7 @@ from launch_ros.descriptions import ComposableNode
 def generate_launch_description():
     share_dir = get_package_share_directory('ros_video_player')
     videos_path = glob(os.path.join(share_dir, "video/*.*"))
-    default_video = ""
+    default_video = "/dev/video0"
     if(len(videos_path)>0):
         default_video = videos_path[0]
 

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.5)
 project(ros_video_player)
 
 # Default to C99
@@ -25,21 +25,10 @@ find_package(cv_bridge REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(OpenCV REQUIRED)
 
-add_library(ros_video_player SHARED
+# executable
+add_executable(ros_video_player
   src/ros_video_player.cpp
 )
-rclcpp_components_register_nodes(ros_video_player
- "ros_video_player::VideoPlayerNode")
-target_compile_definitions(ros_video_player
-  PRIVATE "MY_LIBRARY_BUILDING_LIBRARY"
-)
-target_compile_options(ros_video_player PUBLIC -Wall)
-
-target_include_directories(ros_video_player PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-)
-
 ament_target_dependencies(ros_video_player
   rclcpp
   rclcpp_components
@@ -50,12 +39,47 @@ ament_target_dependencies(ros_video_player
   sensor_msgs
   OpenCV
 )
+target_include_directories(ros_video_player PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+install(TARGETS
+ros_video_player
+  DESTINATION lib/${PROJECT_NAME}
+)
 
+# component
+add_library(ros_video_player_component SHARED
+  src/ros_video_player.cpp
+)
+rclcpp_components_register_nodes(ros_video_player_component
+ "ros_video_player::VideoPlayerNode")
+target_compile_definitions(ros_video_player_component
+  PRIVATE "ROS_VIDEO_PLAYER_LIBRARY"
+)
+target_compile_options(ros_video_player_component PUBLIC -Wall)
 
-install(TARGETS ros_video_player
+target_include_directories(ros_video_player_component PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+
+ament_target_dependencies(ros_video_player_component
+  rclcpp
+  rclcpp_components
+  cv_bridge
+  image_transport
+  builtin_interfaces
+  std_msgs
+  sensor_msgs
+  OpenCV
+)
+
+install(TARGETS ros_video_player_component
   EXPORT export_${PROJECT_NAME}
   DESTINATION lib
 )
+
 
 install(DIRECTORY
   launch

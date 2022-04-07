@@ -8,16 +8,15 @@ namespace ros_video_player{
 
     VideoPlayerNode::VideoPlayerNode(const std::string &node_name, const rclcpp::NodeOptions& options)
     : rclcpp::Node("video_player_node", node_name, options){
-        
-        RCLCPP_INFO(this->get_logger(), "initialize");
+
         this->initializeParameter_();
-        
+
         int camera_idx = -1;
         try{
             camera_idx = std::stoi(this->video_path_);
         }catch  (const std::exception& ex) {
         }
-        
+
         try{
             if(camera_idx >= 0){
                 this->cap_.open(camera_idx);
@@ -32,7 +31,7 @@ namespace ros_video_player{
             RCLCPP_ERROR(this->get_logger(), "can't open " + this->video_path_ + ".");
             rclcpp::shutdown();
         }
-        
+
         this->pub_image_ = image_transport::create_publisher(this, this->publish_topic_name_);
 
         rclcpp::CallbackGroup::SharedPtr group = nullptr;
@@ -43,11 +42,12 @@ namespace ros_video_player{
             std::bind(&VideoPlayerNode::captureCallback_, this),
             group
         );
+        RCLCPP_INFO(this->get_logger(), "Initialized");
     }
 
     void VideoPlayerNode::initializeParameter_(){
         this->declare_parameter<std::string>("publish_topic_name", "image_raw");
-        this->declare_parameter<std::string>("video_path", "");
+        this->declare_parameter<std::string>("video_path", "/dev/video0");
         this->declare_parameter<std::string>("frame_id", "map");
         this->declare_parameter<bool>("loop", true);
         this->declare_parameter<double>("speed", 1.0);
@@ -60,7 +60,7 @@ namespace ros_video_player{
         this->speed_ = this->get_parameter("speed").as_double();
         auto image_size = this->get_parameter("image_size").as_integer_array();
         this->image_size_ = cv::Size(image_size.at(0), image_size.at(1));
-        if(this->speed_ < 0){
+        if(this->speed_ <= 0){
             this->speed_ = 1.0;
         }
         header_.frame_id = this->frame_id_;
@@ -90,6 +90,15 @@ namespace ros_video_player{
         sensor_msgs::msg::Image::SharedPtr pub_img_ = cv_bridge::CvImage(header_, "bgr8", resized_).toImageMsg();
         this->pub_image_.publish(pub_img_);
     }
+}
+
+int main(int argc, char * argv[])
+{
+  rclcpp::init(argc, argv);
+  rclcpp::NodeOptions node_options;
+  rclcpp::spin(std::make_shared<ros_video_player::VideoPlayerNode>(node_options));
+  rclcpp::shutdown();
+  return 0;
 }
 
 RCLCPP_COMPONENTS_REGISTER_NODE(ros_video_player::VideoPlayerNode)

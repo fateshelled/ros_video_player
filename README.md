@@ -23,5 +23,16 @@ ros2 launch ros_video_player ros_video_player.launch.py loop:=True speed:=2.0
 
 USBカメラ('/dev/video0')を再生します。
 ```bash
-ros2 launch ros_video_player ros_video_player.launch.py video_path:="'0'"
+ros2 launch ros_video_player ros_video_player.launch.py video_path:="/dev/video0"
 ```
+
+OpenCVがGStreamer有効になっている場合、GStreamerパイプラインも指定できます。
+```bash
+# MJPEG
+ros2 launch ros_video_player ros_video_player.launch.py video_path:="v4l2src device=/dev/video0 ! image/jpeg, width=640, height=480, framerate=30/1 ! jpegdec ! videoconvert ! appsink"
+
+# YUY2
+ros2 launch ros_video_player ros_video_player.launch.py video_path:="v4l2src device=/dev/video0 ! video/x-raw, format=YUY2, width=640, height=480, framerate=30/1 ! videoconvert ! appsink"
+
+```
+
