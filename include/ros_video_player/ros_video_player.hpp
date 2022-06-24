@@ -34,6 +34,7 @@ namespace ros_video_player{
         cv::Size image_size_;
         bool loop_;
         double speed_;
+        int video_buffer_size_;
     };
 }
 #endif

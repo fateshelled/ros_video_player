@@ -31,6 +31,7 @@ def generate_launch_description():
                             "loop": launch.substitutions.LaunchConfiguration('loop'),
                             "speed": launch.substitutions.LaunchConfiguration('speed'),
                             "image_size": launch.substitutions.LaunchConfiguration('image_size'),
+                            "video_buffer_size": launch.substitutions.LaunchConfiguration('video_buffer_size'),
                         }]),
                 ],
                 output='screen',
@@ -54,6 +55,8 @@ def generate_launch_description():
                                                  default_value="False"),
             launch.actions.DeclareLaunchArgument('speed',
                                                  default_value="1.0"),
+            launch.actions.DeclareLaunchArgument('video_buffer_size',
+                                                 default_value="1"),
             container,
             rqt_image_view,
             # Shutdown launch when rqt_image_view exits.
