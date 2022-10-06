@@ -33,10 +33,20 @@ namespace ros_video_player{
         }
         double buffersize = this->cap_.get(cv::CAP_PROP_BUFFERSIZE);
         if(buffersize > 0){
-                this->cap_.set(cv::CAP_PROP_BUFFERSIZE, (double)this->video_buffer_size_);
+            this->cap_.set(cv::CAP_PROP_BUFFERSIZE, (double)this->video_buffer_size_);
+            RCLCPP_ERROR(this->get_logger(), "CAP_PROP_BUFFERSIZE: %f", this->cap_.get(cv::CAP_PROP_BUFFERSIZE));
         }
 
-        this->pub_image_ = image_transport::create_publisher(this, this->publish_topic_name_);
+        this->camera_info_manager_.reset(new camera_info_manager::CameraInfoManager(this, this->camera_name_, this->camera_info_url_));
+        if(this->camera_info_manager_->isCalibrated())
+        {
+            this->pub_camera_image_ = image_transport::create_camera_publisher(this, this->publish_topic_name_);
+        }
+        else
+        {
+            this->pub_image_ = image_transport::create_publisher(this, this->publish_topic_name_);
+        }
+
 
         rclcpp::CallbackGroup::SharedPtr group = nullptr;
         double fps = this->cap_.get(cv::CAP_PROP_FPS);
@@ -57,6 +67,8 @@ namespace ros_video_player{
         this->declare_parameter<double>("speed", 1.0);
         this->declare_parameter<int>("video_buffer_size", 1);
         this->declare_parameter<std::vector<int64_t>>("image_size", {640, 480});
+        this->declare_parameter<std::string>("camera_info_url", "");
+        this->declare_parameter<std::string>("camera_name", "");
 
         this->publish_topic_name_ = this->get_parameter("publish_topic_name").as_string();
         this->video_path_ = this->get_parameter("video_path").as_string();
@@ -66,6 +78,8 @@ namespace ros_video_player{
         this->video_buffer_size_ = this->get_parameter("video_buffer_size").as_int();
         auto image_size = this->get_parameter("image_size").as_integer_array();
         this->image_size_ = cv::Size(image_size.at(0), image_size.at(1));
+        this->camera_info_url_ = this->get_parameter("camera_info_url").as_string();
+        this->camera_name_ = this->get_parameter("camera_name").as_string();
         if(this->speed_ <= 0){
             this->speed_ = 1.0;
         }
@@ -94,7 +108,16 @@ namespace ros_video_player{
         cv::resize(frame_, resized_, this->image_size_);
         header_.stamp = this->now();
         sensor_msgs::msg::Image::SharedPtr pub_img_ = cv_bridge::CvImage(header_, "bgr8", resized_).toImageMsg();
-        this->pub_image_.publish(pub_img_);
+        if(this->camera_info_manager_->isCalibrated())
+        {
+            auto camera_info = std::make_unique<camera_info_manager::CameraInfo>(this->camera_info_manager_->getCameraInfo());
+            camera_info->header = header_;
+            this->pub_camera_image_.publish(*pub_img_, *camera_info);
+        }
+        else
+        {
+            this->pub_image_.publish(*pub_img_);
+        }
     }
 }
 

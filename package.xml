@@ -14,6 +14,7 @@
   <depend>OpenCV</depend>
   <depend>cv_bridge</depend>
   <depend>image_transport</depend>
+  <depend>camera_info_manager</depend>
   <depend>sensor_msgs</depend>
 
   <test_depend>ament_lint_auto</test_depend>

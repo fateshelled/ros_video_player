@@ -23,6 +23,7 @@ find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(image_transport REQUIRED)
+find_package(camera_info_manager REQUIRED)
 find_package(OpenCV REQUIRED)
 
 # executable
@@ -34,6 +35,7 @@ ament_target_dependencies(ros_video_player
   rclcpp_components
   cv_bridge
   image_transport
+  camera_info_manager
   builtin_interfaces
   std_msgs
   sensor_msgs
@@ -69,6 +71,7 @@ ament_target_dependencies(ros_video_player_component
   rclcpp_components
   cv_bridge
   image_transport
+  camera_info_manager
   builtin_interfaces
   std_msgs
   sensor_msgs
