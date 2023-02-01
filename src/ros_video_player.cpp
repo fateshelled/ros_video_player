@@ -28,7 +28,7 @@ namespace ros_video_player{
             rclcpp::shutdown();
         }
         if(this->cap_.isOpened() == false){
-            RCLCPP_ERROR(this->get_logger(), "can't open " + this->video_path_ + ".");
+            RCLCPP_ERROR(this->get_logger(), "can't open %s.", this->video_path_.c_str());
             rclcpp::shutdown();
         }
         double buffersize = this->cap_.get(cv::CAP_PROP_BUFFERSIZE);
