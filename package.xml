@@ -5,7 +5,7 @@
   <version>1.0.0</version>
   <description>TODO: Package description</description>
   <maintainer email="53618876+fateshelled@users.noreply.github.com">fateshelled</maintainer>
-  <license>TODO: License declaration</license>
+  <license>MIT License</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
